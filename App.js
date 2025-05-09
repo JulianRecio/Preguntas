@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useRef, useState} from "react"
 import {View, Text, Button, Modal, StyleSheet} from "react-native"
 import {questions} from "./questions";
 
@@ -13,17 +13,17 @@ export default function App() {
       setQuestion(questions[index]);
     }
 
-    let favoritesId = [];
+    let favoritesId = useRef([]);
 
     const saveForFavorites = () => {
-        favoritesId.push(questionIndex);
+        favoritesId.current.push(questionIndex);
         console.log("Pregunta guardada: " + questionIndex);
     }
 
     const showFavorites = () => {
-        for (let i = 0; i < favoritesId; i++) {
-            console.log(favoritesId[i])
-        }
+        favoritesId.current.forEach(id => {
+            console.log(id);
+        });
     }
 
     return(
