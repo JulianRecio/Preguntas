@@ -1,23 +1,36 @@
-import {useRef, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {View, Text, Button, Modal, StyleSheet} from "react-native"
-import {questions} from "./questions";
+import {Questions} from "./Questions";
 
 export default function App() {
   const [questionVisible, setQuestionVisible] = useState(false);
-  const [questionIndex, setQuestionIndex] = useState(0)
+  const [questionId, setQuestionId] = useState(0)
   const [question, setQuestion] = useState('');
+  const [deck, setDeck] = useState(Questions);
+  const [index, setIndex] = useState(0);
 
-    const pickQuestion = () => {
-      const index = Math.floor(Math.random() * questions.length);
-      setQuestionIndex(index);
-      setQuestion(questions[index]);
+    const shuffleDeck = () => {
+        const shuffledDeck = [...Questions]
+        for (let i = shuffledDeck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledDeck[i], shuffledDeck[j]] = [shuffledDeck[j], shuffledDeck[i]];
+        }
+        setDeck(shuffledDeck)
+        console.log("Deck shuffled")
+    }
+
+    const drawQuestion = () => {
+        const question = deck[index];
+        setQuestionId(question.id);
+        setQuestion(question.text);
+        setIndex(index + 1);
     }
 
     let favoritesId = useRef([]);
 
     const saveForFavorites = () => {
-        favoritesId.current.push(questionIndex);
-        console.log("Pregunta guardada: " + questionIndex);
+        favoritesId.current.push(questionId);
+        console.log("Pregunta guardada: " + questionId);
     }
 
     const showFavorites = () => {
@@ -26,13 +39,17 @@ export default function App() {
         });
     }
 
+    useEffect(() => {
+        shuffleDeck();
+    }, []);
+
+
     return(
       <View style={styles.TherapyBackground}>
           <View style={styles.TitleContainer}><Text style={styles.TitleText}>Terapia</Text></View>
 
-
           <Button title="Nueva pregunta" onPress={() => {
-              pickQuestion();
+              drawQuestion();
               setQuestionVisible(true);
           }}></Button>
 
@@ -46,6 +63,7 @@ export default function App() {
                  presentationStyle="pageSheet">
               <View style={styles.CardBackground}>
                   <View style={styles.CardContainer}></View>
+                  <Text style={styles.CardText}>{questionId}.</Text>
                   <Text style={styles.CardText}>{question}</Text>
                   <Button title="Agregar a Favoritos" onPress={() => {
                       saveForFavorites();
@@ -63,7 +81,7 @@ export default function App() {
 
 
 const styles = StyleSheet.create({
-    TherapyBackground: {flex: 1, backgroundColor: "plum", padding: 60, display: "flex",justifyContent: "space-evenly"},
+    TherapyBackground: {flex: 1, backgroundColor: "plum", padding: 60, display: "flex", justifyContent: "space-evenly"},
     TitleContainer: {width: "100%", height:"15%", justifyContent: "center", alignItems: "center"},
     TitleText: { textAlign: 'center', textAlignVertical: 'center', fontSize: 80},
     CardBackground: {flex: 1, backgroundColor: "white", padding: 60, display: "flex",justifyContent: "space-between"},
