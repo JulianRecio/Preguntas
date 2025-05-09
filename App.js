@@ -10,6 +10,7 @@ export default function App() {
   const [index, setIndex] = useState(0);
   const [favoriteList, setFavoriteList] = useState([]);
   const [favoritesVisible, setFavoritesVisible] = useState(false);
+  const [discardIndex, setDiscardIndex] = useState(0);
 
 
     let favoritesId = useRef([]);
@@ -25,9 +26,12 @@ export default function App() {
     }
 
     const drawQuestion = () => {
+        console.log("Drawn card at index: " + index)
         const question = deck[index];
         setQuestionId(question.id);
         setQuestionText(question.text);
+        setIndex(index + 1);
+        setDiscardIndex(index);
     }
 
     const saveForFavorites = () => {
@@ -52,6 +56,18 @@ export default function App() {
         setQuestionId(id);
         setQuestionText(text);
     }
+
+    const rollbackQuestion = () => {
+        console.log("Drawn from discard deck at index: " + (discardIndex-1))
+        const question = deck[discardIndex-1];
+        setQuestionId(question.id);
+        setQuestionText(question.text);
+        setDiscardIndex(discardIndex - 1);
+    };
+
+    const rollbackQuestionIsActive = () => {
+        return discardIndex === 0;
+    };
 
     return(
       <View style={styles.TherapyBackground}>
@@ -80,12 +96,12 @@ export default function App() {
                       console.log(favoritesId)
                   }}></Button>
                   <Button title="Volver a la anterior" onPress={() => {
-
-                  }
-                  }
+                      rollbackQuestion()
+                  }}
+                          disabled={rollbackQuestionIsActive()}
                   ></Button>
                   <Button title="Cerrar" onPress={() => {
-                      console.log("Card returned!");
+                      console.log("Card returned! index at: " + index);
                       setQuestionVisible(false)
                   }}></Button>
               </View>
