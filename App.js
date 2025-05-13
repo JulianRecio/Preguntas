@@ -11,6 +11,7 @@ export default function App() {
   const [favoriteList, setFavoriteList] = useState([]);
   const [favoritesVisible, setFavoritesVisible] = useState(false);
   const [discardIndex, setDiscardIndex] = useState(0);
+  const [questionIsFav, setQuestionIsFav] = useState(false);
 
 
     let favoritesId = useRef([]);
@@ -26,6 +27,7 @@ export default function App() {
     }
 
     const drawQuestion = () => {
+        checkQuestionIsFav();
         console.log("Drawn card at index: " + index)
         const question = deck[index];
         setQuestionId(question.id);
@@ -34,9 +36,14 @@ export default function App() {
         setDiscardIndex(index);
     }
 
-    const saveForFavorites = () => {
-        favoritesId.current.push(questionId);
-        console.log("Pregunta guardada: " + questionId);
+    const SaveOrDeleteFromFavorites = () => {
+        if (!questionIsFav) {
+            favoritesId.current.push(questionId);
+            console.log("Pregunta guardada: " + questionId);
+        }else{
+            favoritesId.current = favoritesId.current.filter(id => id !== questionId);
+            console.log("Pregunta eliminada: " + questionId);
+        }
     }
 
     const showFavorites = () => {
@@ -69,6 +76,14 @@ export default function App() {
         return discardIndex === 0;
     };
 
+    const checkQuestionIsFav = () => {
+        if (favoritesId.current.includes(questionId)){
+            setQuestionIsFav(true);
+        }else {
+            setQuestionIsFav(false);
+        }
+    }
+
     return(
       <View style={styles.TherapyBackground}>
           <View style={styles.TitleContainer}><Text style={styles.TitleText}>Terapia</Text></View>
@@ -91,9 +106,10 @@ export default function App() {
                   <View style={styles.CardContainer}></View>
                   <Text style={styles.CardText}>{questionId}.</Text>
                   <Text style={styles.CardText}>{questionText}</Text>
-                  <Button title="Agregar a Favoritos" onPress={() => {
-                      saveForFavorites();
-                      console.log(favoritesId)
+                  <Button title={questionIsFav ? "Quitar de favoritos" : "Agregar a favoritos"} onPress={() => {
+                      SaveOrDeleteFromFavorites();
+                      checkQuestionIsFav();
+                      console.log(favoritesId);
                   }}></Button>
                   <Button title="Volver a la anterior" onPress={() => {
                       rollbackQuestion()
@@ -101,6 +117,7 @@ export default function App() {
                           disabled={rollbackQuestionIsActive()}
                   ></Button>
                   <Button title="Cerrar" onPress={() => {
+                      checkQuestionIsFav();
                       console.log("Card returned! index at: " + index);
                       setQuestionVisible(false)
                   }}></Button>
@@ -136,7 +153,8 @@ export default function App() {
                                           <Text style={styles.CardText}>{questionId}.</Text>
                                           <Text style={styles.CardText}>{questionText}</Text>
                                           <Button title="Agregar a Favoritos" onPress={() => {
-                                              saveForFavorites();
+                                              SaveOrDeleteFromFavorites();
+                                              checkQuestionIsFav();
                                               console.log(favoritesId);
                                           }}></Button>
                                           <Button title="Cerrar" onPress={() => {
