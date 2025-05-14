@@ -27,13 +27,12 @@ export default function App() {
     }
 
     const drawQuestion = () => {
-        checkQuestionIsFav();
-        console.log("Drawn card at index: " + index)
         const question = deck[index];
         setQuestionId(question.id);
         setQuestionText(question.text);
         setIndex(index + 1);
         setDiscardIndex(index);
+        setQuestionIsFav(favoritesId.current.includes(question.id));
     }
 
     const SaveOrDeleteFromFavorites = () => {
@@ -62,6 +61,7 @@ export default function App() {
     const displaySavedCard = (id, text) => {
         setQuestionId(id);
         setQuestionText(text);
+        setQuestionIsFav(favoritesId.current.includes(id));
     }
 
     const rollbackQuestion = () => {
@@ -70,6 +70,7 @@ export default function App() {
         setQuestionId(question.id);
         setQuestionText(question.text);
         setDiscardIndex(discardIndex - 1);
+        setQuestionIsFav(favoritesId.current.includes(question.id))
     };
 
     const rollbackQuestionIsActive = () => {
